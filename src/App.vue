@@ -30,7 +30,6 @@
 
 
 
-
   </div> <!--eof app -->
 </template>
 
@@ -68,6 +67,10 @@ export default {
   min-height:100vh;
 }
 
+.btn {
+    font-size: .9rem;
+}
+
 h1, h2 {
   font-weight: normal;
 }
@@ -84,6 +87,9 @@ ul {
 
 a {
   color: #42b983;
+}
+select {
+        -moz-appearance: none;
 }
 
 

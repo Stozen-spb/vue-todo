@@ -6,7 +6,7 @@
 		            <!-- Modal Header -->
 		            <div class="modal-header">
 		            	<h5 class="modal-title" >
-		                    Редактирование задачи:
+		                   {{taskTitle}}
 		                </h5>
 		                <button type="button" class="close" 
 		                   @click='close'
@@ -23,28 +23,29 @@
 		                  <div class="form-group mb-0">
 		                    <label class='col-form-label-sm mb-0'>Название задачи:</label>
 		                      <ValidationInput validType='notEmpty'
-		                       placeholder="Введите название задачи (обязательно)"
+		                       placeholder="Введите название задачи"
 		                       :startValue='fields.title'
 		                       @input='taskInput'
 		                       :isDisabled='disabledInput'
 		                       />
 		                  </div>
 		                  <div class="form-group mb-0">
-		                    <label class='col-form-label-sm mb-0'>Краткое описание:</label>
-		                     <input   class="form-control form-control-sm" 
-		                      placeholder="Краткое описание задачи"
+		                    <label class='col-form-label-sm mb-0'>Описание:</label>
+		                     <textarea rows="4"  class="form-control form-control-sm" 
+		                      placeholder="Описание задачи"
 		                      v-model.trim='fields.shortDescr'
 		                      :disabled='disabledInput'
 		                      />
 		                  </div>
-
+							
 						  <div class="form-group mb-0">
 		                    <label class='col-form-label-sm mb-0'  >Класс неисправности:</label>
 		                     <select class='form-control form-control-sm'
 		                     v-model='fields.type'
 		                     :disabled='disabledInput'
+		                     required
 		                     >
-		                     	<option selected>Выбрать...</option>
+		                     	<option value='' selected>Выбрать...</option>
 		                     	<option v-for='(item,index) in taskClasses'
 		                     	:value='item'
 		                     	>{{item}}</option>
@@ -59,33 +60,65 @@
 		                     />
 		                  </div>
 
-		                   <div class="form-group mb-0">
-		                    <label class='col-form-label-sm mb-0'  >Приоритет:</label>
-		                     <select class='form-control form-control-sm'
-		                     v-model='fields.priority'
-		                     :disabled='disabledInput'
-		                     >
-		                     	<option selected>Выбрать...</option>
-		                     	<option v-for='(item,index) in priorityOptions'
-		                     	:value='item.value'
-		                     	>{{item.name}}</option>
-		                     </select>
-		                  </div>
+<!-- 		                   <div class="form-group mb-0">
+			                    <label class='col-form-label-sm mb-0'  >Приоритет:</label>
+			                     <select class='form-control form-control-sm'
+			                     v-model='fields.priority'
+			                     :disabled='disabledInput'
+			                     >
+			                     	<option selected>Выбрать...</option>
+			                     	<option v-for='(item,index) in priorityOptions'
+			                     	:value='item.value'
+			                     	>{{item.name}}</option>
+			                     </select>
+			                  </div>
 
-		                  <div class="form-group mb-0">
-							<div v-if='fields.isArchived == "true"'>
-								<label class='col-form-label-sm mb-0'>Исполнено:</label>
-		                     	<input type="text" class="form-control form-control-sm" disabled
-		                     	:value=' new Date( Date.parse(fields.finishedTime)).toLocaleString()'
-		                     	>
+			                  <div class="form-group mb-0">
+								<div v-if='fields.isArchived == "true"'>
+									<label class='col-form-label-sm mb-0'>Исполнено:</label>
+			                     	<input type="text" class="form-control form-control-sm" disabled
+			                     	:value=' new Date( Date.parse(fields.finishedTime)).toLocaleString()'
+			                     	>
 
-							</div>
+								</div>
 
-							<div v-else>
-								<label class='col-form-label-sm mb-0'>Исполнить до:</label>
-		                     	<datetime format="YYYY-MM-DD H:i:s" width="300px" v-model="fields.dateEnd" firstDayOfWeek="1" ></datetime>
-							</div>
-		                  </div>
+								<div v-else>
+									<label class='col-form-label-sm mb-0'>Исполнить до:</label>
+			                     	<datetime format="YYYY-MM-DD H:i:s" width="214px" v-model="fields.dateEnd" firstDayOfWeek="1" ></datetime>
+								</div>
+		                  </div> -->
+
+		                  	<div class="form-group mb-0">
+							 	<div class="row">
+									<div class="col">
+										 <label class='col-form-label-sm mb-0'>Приоритет:</label>
+									</div>
+									<div class="col">
+										<label v-if='fields.isArchived == "true"' class='col-form-label-sm mb-0'>Исполнено:</label>	
+										<label v-else class='col-form-label-sm mb-0'>Исполнить до:</label>	
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<select class='form-control form-control-sm'
+					                     v-model='fields.priority'
+					                     :disabled='disabledInput'
+					                     >
+					                     	<option value='' selected>Выбрать...</option>
+					                     	<option v-for='(item,index) in priorityOptions'
+					                     	:value='item.value'
+					                     	>{{item.name}}</option>
+					                     </select>
+									</div>
+									<div class="col">
+										<input v-if='fields.isArchived == "true"' type="text" class="form-control form-control-sm" disabled
+				                     	:value=' new Date( Date.parse(fields.finishedTime)).toLocaleString()'
+				                     	>
+				                     	<datetime v-else format="YYYY-MM-DD H:i:s" width="218px" v-model="fields.dateEnd" firstDayOfWeek="1" ></datetime>
+									</div>
+								</div>
+		                  	</div>
 
 		                  <div class="form-group mb-0">
 								<div class="row">
@@ -102,7 +135,7 @@
 										v-model='fields.worker'
 										:disabled='disabledInput'
 										>
-											<option selected>Выбрать...</option>
+											<option value='' selected>Выбрать...</option>
 										</select>
 									</div>
 									<div class="col">
@@ -110,7 +143,7 @@
 										v-model='fields.supervisor'
 										:disabled='disabledInput'
 										>
-											<option selected>Выбрать...</option>
+											<option value='' selected>Выбрать...</option>
 										</select>
 									</div>
 								</div>
@@ -145,9 +178,13 @@
 		                </button>
 		                <button type="button" class="btn btn-primary"
 							@click='saveForm'
+							:disabled = 'formInvalid'
 		                >
 		                    Сохранить
 		                </button>
+		            </div>
+		            <div class="created-by">
+		                	{{dateCreated}}
 		            </div>
 		        </div>
 		    </div> <!-- eof modal dialog -->
@@ -180,7 +217,9 @@
 					isArchived: '',
 					status: '',
 					finishedTime:''
-				}
+				},
+				userStatus: 'normal',
+				formErrors: true,
 			}
 		},
 		computed: {
@@ -199,7 +238,28 @@
 				if (this.fields.isArchived == 'true') {
 					return true
 				} else return false
+			},
+			dateCreated() {
+				if ( this.fields.dateCreated) {
+					return `Создано superadmin ${ new Date( Date.parse(this.fields.dateCreated)).toLocaleString()}`
+				}
+			},
+			taskTitle() {
+				if (this.fields.id) {
+					return `Карточка задачи #${this.fields.id} `
+				} else return `Создание задачи`
+			},
+			restrictedField() {
+				if (this.userStatus != 'manager' || this.userStatus != 'admin' ) {
+					return true
+				}
+			},
+			formInvalid() {
+				if (this.formErrors == true || !this.fields.type) {
+					return true
+				} else return false
 			}
+
 
 		},
 		methods: {
@@ -208,6 +268,7 @@
 			},
 			taskInput(e){
 				this.fields.title = e.value;
+				this.formErrors = e.errors;
 			},
 			saveForm() {
 				let newObj = {};
@@ -221,7 +282,7 @@
 					this.$store.commit('closeEdit')
 				} else {
 					//создание новой задачи
-					newObj.id = new Date();
+					newObj.id = '' +  Math.random();
 					newObj.dateCreated = moment().format('YYYY-MM-DD HH:mm:ss')
 					newObj.isArchived = 'false'
 					this.$store.commit('createNewTask', newObj)
@@ -247,6 +308,7 @@
 				for (let key in obj) {
 					this.fields[key] = obj[key]
 				}
+				this.formErrors = false;
 			}
 		}
 	}
@@ -254,10 +316,6 @@
 </script>
 
 <style scoped>
-	.form-body {
-
-
-	}
 
 	.modal-content {
 		box-shadow: 6px 6px 11px 0px rgba(0,0,0,0.75);
@@ -270,6 +328,22 @@
 	    top: 0px;
 	    text-align: left;
 	    z-index: 50;
+	}
+
+	.created-by {
+		color: #99979c;
+		margin-top: -5px;
+		padding:0px 15px 5px 10px;
+		font-size: 14px;
+		text-align: right;
+	}
+
+	input:invalid {
+	  background-color: #ffdddd;
+	}
+
+	select:invalid {
+	  background-color: #ffdddd;
 	}
 
 	

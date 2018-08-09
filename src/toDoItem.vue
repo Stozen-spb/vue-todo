@@ -1,7 +1,7 @@
 <template>
 	<div class="card h-100">
 	  <div class="card-header ">
-	     {{title}}
+	     {{title.toUpperCase()}}
 	  </div>
 	  <div class="progress mb-2">
 
@@ -15,7 +15,7 @@
 	  </div>
 	  <div class="card-body">
 	    <h5 class="card-title">{{type}}</h5>
-	    <p class="card-text">{{shortDescr}}</p>
+	    <p class="card-text">{{dateEndHumanFormat}}</p>
 		<div class="group-of-btns">
 			<button type="button" class="btn btn-primary btn-block"
 				@click='editItem'
@@ -120,6 +120,9 @@
 				}
 
 			},
+			dateEndHumanFormat() {
+				return 'Исполнить до ' + new Date( Date.parse(this.dateEnd)).toLocaleString();
+			}
 
 		},
 		methods: {
@@ -144,8 +147,12 @@
 		position: relative;
 	}
 	.card-header {
-		padding:10px 12px;
+		padding:10px 10px;
 		font-weight: 700;
+		min-height: 68px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
 	}
 	.card-body {
 		display:flex;

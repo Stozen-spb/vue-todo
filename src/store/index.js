@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
 		toDoItems: [
 			{
 				id: '1',
-				title: 'Изучить Вью',
+				title: 'Изучить фреймворк Vue.js',
 				type: 'firstType',
 				shortDescr: 'нужно изучить фреймворк vue.js',
 				dateCreated: '2018-07-30 14:03:00',
