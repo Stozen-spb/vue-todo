@@ -330,6 +330,23 @@
 	    z-index: 50;
 	}
 
+	.modal-footer {
+		display:flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	@media (max-width: 576px ) {
+		.modal-footer {
+			justify-content: center;
+		}
+		.modal-footer .btn {
+			width:100%;
+			margin-bottom: 2px;
+
+		}
+	}
+
 	.created-by {
 		color: #99979c;
 		margin-top: -5px;
