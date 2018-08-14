@@ -285,6 +285,7 @@
 					newObj.id = '' +  Math.random();
 					newObj.dateCreated = moment().format('YYYY-MM-DD HH:mm:ss')
 					newObj.isArchived = 'false'
+					newObj.status = 'progress'
 					this.$store.commit('createNewTask', newObj)
 					this.$store.commit('closeEdit')
 				}

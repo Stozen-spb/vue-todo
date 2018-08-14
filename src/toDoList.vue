@@ -48,7 +48,7 @@
 			
 		},
 		created() {
-			this.$store.commit('setFilter', 'all');
+			this.$store.commit('setFilter', {firstFilter: 'all', secondFilter:'all'});
 		}
 	}
 	

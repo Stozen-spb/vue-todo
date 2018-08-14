@@ -75,6 +75,7 @@ export const store = new Vuex.Store({
 
 		],
 		activeFilter: 'all',
+		secondFilter: 'all',
 		activeItemIndex: null,
 		archivedItems: [],
 		alertClass: 'primary',
@@ -101,8 +102,9 @@ export const store = new Vuex.Store({
 
 	},
 	mutations : {
-		setFilter(state,activeFilter) {
-			state.activeFilter = activeFilter;
+		setFilter(state,payLoad) {
+			state.activeFilter = payLoad.firstFilter;
+			state.secondFilter = payLoad.secondFilter;
 		},
 		deleteItem(state, id) {
 			let indexToDel = 0;
@@ -177,13 +179,22 @@ export const store = new Vuex.Store({
 		},
 		toDoItemsSorted(state) {
 			// если нет никаких фильторов
-			if (state.activeFilter == 'all') {
+			if (state.activeFilter == 'all' && state.secondFilter == 'all') {
 				return state.toDoItems
 			}
-			// применение фильтра
-			let result = state.toDoItems.filter((item) => {
+			let result = [];
+			// применение первого фильтра
+			if (state.activeFilter != 'all'){
+				result = state.toDoItems.filter((item) => {
 				return (item.type == state.activeFilter );
-			})
+				})
+			} else result = state.toDoItems;
+			// применение второго фильтра
+			if (state.secondFilter != 'all') {
+				result = result.filter((item) => {
+				return (item.status == state.secondFilter );
+				})
+			}
 			return result;
 		},
 		getObjectToFillForm(state) {

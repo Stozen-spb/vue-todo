@@ -15,7 +15,8 @@ const routes = [
 		path: '/current',
 		component: toDoList
 	},
-	{
+	{	
+		name: 'archive',
 		path: '/archive',
 		component: toDoListArchive
 	},
