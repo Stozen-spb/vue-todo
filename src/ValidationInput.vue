@@ -1,6 +1,6 @@
 <template>
 	<div class="box">
-		<input type='text' class="form-control form-control-sm" autocomplete="on" 
+		<input type='text' class="form-control form-control-sm" autocomplete="on"  required
 			:placeholder='placeholder'
 			v-model.trim='value'
 			@input='validate($event)'

@@ -10,3 +10,14 @@
 	max-width: 1140px;
 	margin: 0 auto;
 }
+
+input:invalid {
+  background-color: #ffdddd;
+}
+
+select:invalid {
+  background-color: #ffdddd;
+}
+	.task-table td {
+    vertical-align: middle;
+	}

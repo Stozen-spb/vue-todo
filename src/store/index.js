@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex);
-import {findIndex} from '../helpers.js'
+import {findIndex, chainFilters, dateFilter} from '../helpers.js'
 export const store = new Vuex.Store({
 	state: {
 		toDoItems: [
@@ -17,7 +17,7 @@ export const store = new Vuex.Store({
 				status: 'progress',
 				taskClass: 'santehnika',
 				area: 'some place',
-				priority: '2',
+				priority: '0',
 				worker: 'Газманов Олег',
 				supervisor: 'Филипп Бедро',
 				createdBy: 'manager',
@@ -34,7 +34,7 @@ export const store = new Vuex.Store({
 				status: 'progress',
 				taskClass: 'santehnika',
 				area: 'some place',
-				priority: '2',
+				priority: '1',
 				worker: 'Газманов Олег',
 				supervisor: 'Филипп Бедро',
 				createdBy: 'manager',
@@ -55,7 +55,7 @@ export const store = new Vuex.Store({
 				supervisor: 'Филипп Бедро',
 				createdBy: 'manager',
 			},
-						{
+			{
 				id: '4',
 				title: 'архивный итем',
 				type: 'firstType',
@@ -66,16 +66,37 @@ export const store = new Vuex.Store({
 				status: 'done',
 				taskClass: 'santehnika',
 				area: 'some place',
-				priority: '2',
+				priority: '1',
 				worker: 'Газманов Олег',
 				supervisor: 'Филипп Бедро',
 				createdBy: 'manager',
 				finishedTime: '2018-08-07 07:30:00'
 			},
+			{
+				id: '5',
+				title: 'итем пауза',
+				type: 'firstType',
+				shortDescr: 'пауза пауза',
+				dateCreated: '2018-07-28 00:03:00',
+				dateEnd: '2018-08-22 18:30:00',
+				isArchived: 'false',
+				status: 'canceled',
+				taskClass: 'santehnika',
+				area: 'some place',
+				priority: '1',
+				worker: null,
+				supervisor: 'Филипп Бедро',
+				createdBy: 'manager',
+				finishedTime: '2018-08-07 07:30:00'
+			},
+
 
 		],
-		activeFilter: 'all',
-		secondFilter: 'all',
+		typeFilter: 'all',
+		statusFilter: 'all',
+		priorityFilter: 'all',
+		dateFilter: 'all',
+		searchFilter: '',
 		activeItemIndex: null,
 		archivedItems: [],
 		alertClass: 'primary',
@@ -83,6 +104,28 @@ export const store = new Vuex.Store({
 		alertShown: false,
 		isEditing: false,
 		taskClasses: ['firstType','secondType','thirdType','myClass'],
+		taskStatuses: [
+			{
+				text: 'Не начато',
+				value: 'notStarted'
+			},
+			{
+				text: 'Готово',
+				value: 'done'
+			},
+			{
+				text: 'Отменено',
+				value: 'canceled'
+			},
+			{
+				text: 'Отложено',
+				value: 'pause'
+			},
+			{
+				text: 'В процессе',
+				value: 'progress'
+			},
+		],
 		priority: [
 			{
 				name: 'низкий',
@@ -103,8 +146,13 @@ export const store = new Vuex.Store({
 	},
 	mutations : {
 		setFilter(state,payLoad) {
-			state.activeFilter = payLoad.firstFilter;
-			state.secondFilter = payLoad.secondFilter;
+			state.typeFilter = payLoad.firstFilter;
+			state.statusFilter = payLoad.secondFilter;
+			state.priorityFilter = payLoad.priorityFilter;
+			state.dateFilter = payLoad.dateFilter;
+		},
+		searchItems(state,payLoad) {
+			state.searchFilter = payLoad;
 		},
 		deleteItem(state, id) {
 			let indexToDel = 0;
@@ -158,6 +206,10 @@ export const store = new Vuex.Store({
 		archiveItem(state, id) {
 			let index = findIndex(state.toDoItems, id);
 			state.toDoItems[index].isArchived = 'true'
+		},
+		changeItemStatus(state,payLoad) {
+			let index = findIndex(state.toDoItems, payLoad.id);
+			state.toDoItems[index].status = payLoad.status;
 		}
 
 
@@ -178,23 +230,28 @@ export const store = new Vuex.Store({
 
 		},
 		toDoItemsSorted(state) {
+			// поиск по названию всегда возвращает задания со сброшенными фильтрами
 			// если нет никаких фильторов
-			if (state.activeFilter == 'all' && state.secondFilter == 'all') {
+			if (state.typeFilter == 'all' && 
+				state.statusFilter == 'all' && 
+				state.priorityFilter == 'all' && 
+				state.dateFilter == 'all' && 
+				state.searchFilter == '' ) {
 				return state.toDoItems
 			}
-			let result = [];
-			// применение первого фильтра
-			if (state.activeFilter != 'all'){
-				result = state.toDoItems.filter((item) => {
-				return (item.type == state.activeFilter );
-				})
-			} else result = state.toDoItems;
-			// применение второго фильтра
-			if (state.secondFilter != 'all') {
-				result = result.filter((item) => {
-				return (item.status == state.secondFilter );
+			if (state.searchFilter != '') {
+				return state.toDoItems.filter( item => {
+					return item.title.toUpperCase().indexOf(state.searchFilter.toUpperCase()) != -1
 				})
 			}
+			//первый фильтр
+			let result = chainFilters(state.typeFilter, state.toDoItems, 'type')
+			//второй фильтр
+			result = chainFilters(state.statusFilter, result, 'status')
+			//третий фильтр
+			result = chainFilters(state.priorityFilter, result, 'priority')
+			//сортировка по дате
+			result = dateFilter(state.dateFilter, result, 'dateEnd')
 			return result;
 		},
 		getObjectToFillForm(state) {
@@ -202,7 +259,13 @@ export const store = new Vuex.Store({
 				return state.toDoItems[state.activeItemIndex]
 
 			} else console.warn('editing is false or no active item')
-		}
+		},
+		priorityList(state){
+			return state.priority
+		},
+		taskStatuses(state) {
+			return state.taskStatuses
+		},
 	}
 
 })

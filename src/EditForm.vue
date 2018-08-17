@@ -5,8 +5,19 @@
 		        <div class="modal-content">
 		            <!-- Modal Header -->
 		            <div class="modal-header">
-		            	<h5 class="modal-title" >
-		                   {{taskTitle}}
+		            	<h5 class="modal-title d-flex">
+		                   <div >{{taskTitle}}</div> 
+		                   <div 
+		                   	 v-if='fields.isArchived != "true"'
+		                     @click='isOpenStatusSelect = true'
+		                   	 class='ml-auto status-select'
+		                   	 >
+		                   		{{statusText}}
+		                   		<PopOverList v-if='isOpenStatusSelect' :items='taskStatuses'
+		                   		@selectStatus='selectStatus'
+		                   		>
+		                   		</PopOverList>
+		               		</div>
 		                </h5>
 		                <button type="button" class="close" 
 		                   @click='close'
@@ -37,6 +48,14 @@
 		                      :disabled='disabledInput'
 		                      />
 		                  </div>
+		                  <div class="form-group mb-0">
+		                  	<label for="" class="col-form-label-sm mb-0">Примечание менеджера:</label>
+		                  	<textarea rows="2"  class="form-control form-control-sm" 
+		                      placeholder="Примечание менеджера"
+		                      v-model.trim='fields.managerComment'
+		                      :disabled='disabledInput'
+		                      />
+		                  </div>
 							
 						  <div class="form-group mb-0">
 		                    <label class='col-form-label-sm mb-0'  >Класс неисправности:</label>
@@ -59,34 +78,6 @@
 		                     :disabled='disabledInput'
 		                     />
 		                  </div>
-
-<!-- 		                   <div class="form-group mb-0">
-			                    <label class='col-form-label-sm mb-0'  >Приоритет:</label>
-			                     <select class='form-control form-control-sm'
-			                     v-model='fields.priority'
-			                     :disabled='disabledInput'
-			                     >
-			                     	<option selected>Выбрать...</option>
-			                     	<option v-for='(item,index) in priorityOptions'
-			                     	:value='item.value'
-			                     	>{{item.name}}</option>
-			                     </select>
-			                  </div>
-
-			                  <div class="form-group mb-0">
-								<div v-if='fields.isArchived == "true"'>
-									<label class='col-form-label-sm mb-0'>Исполнено:</label>
-			                     	<input type="text" class="form-control form-control-sm" disabled
-			                     	:value=' new Date( Date.parse(fields.finishedTime)).toLocaleString()'
-			                     	>
-
-								</div>
-
-								<div v-else>
-									<label class='col-form-label-sm mb-0'>Исполнить до:</label>
-			                     	<datetime format="YYYY-MM-DD H:i:s" width="214px" v-model="fields.dateEnd" firstDayOfWeek="1" ></datetime>
-								</div>
-		                  </div> -->
 
 		                  	<div class="form-group mb-0">
 							 	<div class="row">
@@ -113,7 +104,7 @@
 									</div>
 									<div class="col">
 										<input v-if='fields.isArchived == "true"' type="text" class="form-control form-control-sm" disabled
-				                     	:value=' new Date( Date.parse(fields.finishedTime)).toLocaleString()'
+				                     	:value = 'dateEndHumanFormat'
 				                     	>
 				                     	<datetime v-else format="YYYY-MM-DD H:i:s" width="218px" v-model="fields.dateEnd" firstDayOfWeek="1" ></datetime>
 									</div>
@@ -208,6 +199,7 @@
 					title: '',
 					dateEnd: '',
 					shortDescr: '',
+					managerComment: '',
 					type: '',
 					area: '',
 					priority: '',
@@ -220,6 +212,8 @@
 				},
 				userStatus: 'normal',
 				formErrors: true,
+				isOpenStatusSelect: false,
+
 			}
 		},
 		computed: {
@@ -228,6 +222,9 @@
 			},
 			priorityOptions() {
 				return this.$store.state.priority;
+			},
+			taskStatuses(){
+				return this.$store.getters.taskStatuses;
 			},
 			deleteTaskIsDisabled(){
 				if (this.$store.state.activeItemIndex == null) {
@@ -258,6 +255,26 @@
 				if (this.formErrors == true || !this.fields.type) {
 					return true
 				} else return false
+			},
+			dateEndHumanFormat(){
+				moment(this.dateEnd).format('DD.MM.YYYY, HH:MM')
+			},
+			statusText(){
+				if (this.fields.status == 'done') {
+					return `Готово`
+				}
+				if (this.fields.status == 'notStarted') {
+					return `Не начато`
+				}
+				if (this.fields.status == 'canceled') {
+					return `Отменено`
+				}
+				if (this.fields.status == 'pause') {
+					return `Отложено`
+				}
+				if (this.fields.status == 'progress') {
+					return `В процессе`
+				}
 			}
 
 
@@ -282,7 +299,7 @@
 					this.$store.commit('closeEdit')
 				} else {
 					//создание новой задачи
-					newObj.id = '' +  Math.random();
+					newObj.id = '' +  Math.random().toFixed(4);
 					newObj.dateCreated = moment().format('YYYY-MM-DD HH:mm:ss')
 					newObj.isArchived = 'false'
 					newObj.status = 'progress'
@@ -292,13 +309,28 @@
 
 			},
 			deleteTask() {
-				this.$store.commit('deleteItem', this.fields.id)
-				this.$store.commit('closeEdit')
+				if ( confirm('Удалить?') ) {
+					this.$store.commit('deleteItem', this.fields.id)
+					this.$store.commit('closeEdit')
+					this.$store.commit('showAlert', {type: 'success', text:'Итем удален.'})
+				}
 			},
 			archiveThisTask() {
 				this.$store.commit('archiveItem', this.fields.id)
 				this.$store.commit('closeEdit')
-			}
+				this.$store.commit('showAlert', {type: 'success', text:'Итем перемещен в архив.'})
+			},
+			selectStatus(e){
+				this.isOpenStatusSelect = false;
+				this.fields.status = e.value
+				this.$store.commit('changeItemStatus',{id: this.fields.id, status: this.fields.status});
+				
+			},
+			checkClickArea(e) {
+				if ( e.target.classList.contains('status-select') ) {
+					return false
+				} else this.isOpenStatusSelect = false;
+			},
 			
 		},
 		created() {
@@ -311,16 +343,38 @@
 				}
 				this.formErrors = false;
 			}
+			// обработчик клика в любом месте документа и закрытия выбора статуса
+			document.addEventListener('click', this.checkClickArea)
+		},
+		beforeDestroy() {
+			document.removeEventListener('click', this.checkClickArea)
 		}
-	}
+}		
+
+
 	
 </script>
 
 <style scoped>
 
 	.modal-content {
-		box-shadow: 6px 6px 11px 0px rgba(0,0,0,0.75);
+		border: 1px solid #e0e0e0;
+		border-radius: 2px;
+		box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.1);
 	}
+	.modal-title {
+		width:100%;
+	}
+
+	.modal-header, 
+	.modal-footer {
+		padding: 0.5rem 1rem;
+	}
+
+	.modal-body {
+		padding: 0 1rem 0.5rem 1rem ;
+	}
+
 	.container {
 		position: absolute;
 		right: 0;
@@ -329,6 +383,13 @@
 	    top: 0px;
 	    text-align: left;
 	    z-index: 50;
+	}
+	.status-select {
+		position: relative;
+	}
+	.status-select:hover {
+		cursor:pointer;
+		text-decoration: underline;					
 	}
 
 	.modal-footer {
@@ -356,13 +417,7 @@
 		text-align: right;
 	}
 
-	input:invalid {
-	  background-color: #ffdddd;
-	}
 
-	select:invalid {
-	  background-color: #ffdddd;
-	}
 
 	
 </style>

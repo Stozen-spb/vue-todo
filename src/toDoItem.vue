@@ -1,46 +1,27 @@
 <template>
-	<div class="card h-100">
-	  <div class="card-header ">
-	     {{title.toUpperCase()}}
-	  </div>
-	  <div class="progress mb-2">
-
-		  <div class="progress-bar"  :style="progressWidth"> </div>
-		  <div class="progress-text">{{deadLineInHours}}</div>
-	  </div>
-	  <div class="row justify-content-center">
-	  	<div class="col-8">
-	  		<img class="card-img-top" src="./assets/notepad.png" alt="Card image cap">
-	  	</div>
-	  </div>
-	  <div class="card-body">
-	    <h5 class="card-title">{{type}}</h5>
-	    <p class="card-text">{{dateEndHumanFormat}}</p>
-		<div class="group-of-btns">
-			<button type="button" class="btn btn-primary btn-block"
-				@click='editItem'
-			>
-
-				<i class="fa fa-pencil-square-o" aria-hidden="true"></i> 
-				Редактировать
-			</button> 
-			<button v-if='isArchived != "true"' type="button" class="btn btn-success btn-block"
-				@click='makeDone'
-			>
-				<i class="fa fa-check" aria-hidden="true"></i>
-				Готово
-			</button> 
-			<div class='delete-btn'
-			@click='deleteItem'
-			>
-				<i class="fa fa-times text-danger" aria-hidden="true"></i>
-			</div> 
-		</div>
-
-
-
-	  </div>
-	</div>
+	<tr @click='editItem'>
+		<td>
+			{{title.toUpperCase()}}
+		</td>
+		<td class='priority'>
+			<i class="fa fa-circle priority-icon" :class='priorytClass' aria-hidden="true"></i> <span> {{priorityHumanFormat}}</span>
+		</td>
+		<td>
+			{{type}}
+		</td>
+		<td>
+			{{worker}} <br> {{area}}
+		</td>
+		<td>
+			{{dateEndHumanFormat}}
+		</td>
+		<td>
+			<div class="progress">
+			  <div class="progress-bar"  :style="progressWidth"> </div>
+			  <div class="progress-text">{{deadLineInHours}}</div>
+		  </div>
+		</td>
+	</tr>
 </template>
 
 <script>
@@ -55,6 +36,13 @@
 			},
 			type: {
 				type: String,
+			},
+			priority: {
+				type: String,
+			},
+			worker: {
+				type: String,
+				default: 'Не назначен'
 			},
 			shortDescr: {
 				type: String,
@@ -71,6 +59,9 @@
 			},
 			status: {
 				type: String
+			},
+			area: {
+				type: String
 			}
 		},
 		data() {
@@ -83,6 +74,16 @@
 				if (this.status == 'done') {
 					return `background-color:#28a745; width:100%;`
 				}
+				if (this.status == 'notStarted') {
+					return `background-color:#1EA5E8;; width:100%;`
+				}
+				if (this.status == 'canceled') {
+					return `background-color:#78909C; width:100%;`
+				}
+				if (this.status == 'pause') {
+					return `background-color:#a654dc; width:100%;`
+				}
+
 				let width = 0;
 				let dateCreated = Date.parse(this.dateCreated);
 				let dateEnd = Date.parse(this.dateEnd);
@@ -97,6 +98,17 @@
 				if (this.status == 'done') {
 					return `Готово`
 				}
+				if (this.status == 'notStarted') {
+					return `Не начато`
+				}
+				if (this.status == 'canceled') {
+					return `Отменено`
+				}
+				if (this.status == 'pause') {
+					return `Отложено`
+				}
+
+				// если ничего не подошло рассчитываем дедлайн
 				let hours = 0;
 				let days = 0;
 				let minutes = 0;
@@ -121,7 +133,15 @@
 
 			},
 			dateEndHumanFormat() {
-				return 'Исполнить до ' + new Date( Date.parse(this.dateEnd)).toLocaleString();
+				return  moment(this.dateEnd).format('DD.MM.YYYY, HH:MM')
+			},
+			priorityHumanFormat() {
+				const priorityList = ['низкий','средний','высокий'];
+				return priorityList[this.priority];
+			},
+			priorytClass() {
+				const priorityList = ['low-priority','normal-priority','high-priority'];
+				return priorityList[this.priority];
 			}
 
 		},
@@ -143,28 +163,28 @@
 </script>
 
 <style scoped>
-	.card {
-		position: relative;
+	.priority-icon {
+		font-size: 7px;
+	    line-height: 7px;
+	    vertical-align: middle;
 	}
-	.card-header {
-		padding:10px 10px;
-		font-weight: 700;
-		min-height: 68px;
-	    display: flex;
-	    align-items: center;
-	    justify-content: center;
+	.low-priority {
+		color:#1EA5E8;
 	}
-	.card-body {
-		display:flex;
-		flex-direction: column;
+
+	.normal-priority {
+		color:rgb(244, 162, 53);
 	}
-	.card-body p {
-		flex-grow: 1;
+
+	.high-priority {
+		color: #ec4721;
 	}
 	.progress {
 		position: relative;
 		height: 25px;
+		text-align: center;
 	}
+
 	.progress-text {
 		position: absolute;
 		left:0;
@@ -176,6 +196,7 @@
 		color: #fff;
 		text-shadow: #000 1px 1px 0, #000 -1px -1px 0, #000 -1px 1px 0, #000 1px -1px 0;
 	}
+
 	.delete-btn {
 		position: absolute;
 		display: none;
@@ -187,6 +208,7 @@
 	.delete-btn:hover {
 		cursor: pointer;
 	}
+
 	.card:hover .delete-btn {
 		display: block;
 	}

@@ -63,8 +63,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #eaf1f1;
-  /*margin-top: 60px;*/
-  min-height:100vh;
+  height: 100vh;
 }
 
 .btn {

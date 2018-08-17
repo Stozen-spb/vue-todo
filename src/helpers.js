@@ -1,13 +1,13 @@
 
 
-	function alertSome(text) {
-		alert(text);
-	}
+function alertSome(text) {
+	alert(text);
+}
 
-	function alertSome2(text) {
-		alert(text + '222');
-	}
-	var foo = 'bar'
+function alertSome2(text) {
+	alert(text + '222');
+}
+var foo = 'bar'
 
 function getIndex(n){
 
@@ -16,6 +16,10 @@ function getIndex(n){
   return n/10%10^1&&d<4?+!d:2;
 
 }
+
+// пример использования:
+
+// alert( ['дня', 'день', 'дней'][getIndex(12)] );
 
 function findIndex(arr, id) {
 	let result = -1;
@@ -27,8 +31,44 @@ function findIndex(arr, id) {
 	})
 	return result;
 }
+/**
+ * фильтрация
+ * @param {string} filter значение фильтра
+ * @param {array} массив для фильтрации
+ * @param {string} поле по которому идет фильтрация
+ */
+function chainFilters(filter,array, property) {
+	if (filter != 'all'){
+		array = array.filter((item) => {
+		return (item[property] == filter );
+		})
+		return array;
+	} else return array;
+}
+/**
+ * сортировка 
+ * @param {string} filter значение фильтра
+ * @param {array} массив для сортировки
+ * @param {string} поле по которому идет сортировка
+ */
+function dateFilter(filter,array, property) {
+	if (filter != 'all'){
 
-// пример использования:
+		if (filter == 'low') {
+			array = array.sort((a,b) => {
+			return Date.parse( a[property] ) > Date.parse( b[property] ) ? 1 : 0 ;
+			})
+		}
 
-// alert( ['дня', 'день', 'дней'][getIndex(12)] );
-export {alertSome, alertSome2, foo, getIndex, findIndex};
+		if (filter == 'high') {
+			array = array.sort((a,b) => {
+			return Date.parse( a[property] ) < Date.parse( b[property] ) ? 1 : 0 ;
+			})
+		}
+
+		return array;
+	} else return array;
+}
+
+
+export {alertSome, alertSome2, foo, getIndex, findIndex, chainFilters, dateFilter};

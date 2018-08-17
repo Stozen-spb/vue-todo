@@ -11,6 +11,7 @@ import AppFilter from './AppFilter.vue'
 import AlertComponent from './AlertComponent.vue'
 import EditForm from './EditForm.vue'
 import ValidationInput from './ValidationInput.vue'
+import PopOverList from './PopOverList.vue'
 import E404 from './E404.vue'
 import datetime from 'vuejs-datetimepicker'
 import moment from 'moment/min/moment.min.js'
@@ -26,6 +27,7 @@ Vue.component('AppFilter', AppFilter)
 Vue.component('AlertComponent', AlertComponent)
 Vue.component('EditForm', EditForm)
 Vue.component('ValidationInput', ValidationInput)
+Vue.component('PopOverList', PopOverList)
 Vue.component('datetime', datetime)
 Vue.component('E404',E404)
 
