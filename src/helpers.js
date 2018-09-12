@@ -1,14 +1,5 @@
 
 
-function alertSome(text) {
-	alert(text);
-}
-
-function alertSome2(text) {
-	alert(text + '222');
-}
-var foo = 'bar'
-
 function getIndex(n){
 
   var d=((n|=0)+9)%10|0;
@@ -71,4 +62,4 @@ function dateFilter(filter,array, property) {
 }
 
 
-export {alertSome, alertSome2, foo, getIndex, findIndex, chainFilters, dateFilter};
+export { getIndex, findIndex, chainFilters, dateFilter};

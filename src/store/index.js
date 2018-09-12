@@ -155,14 +155,7 @@ export const store = new Vuex.Store({
 			state.searchFilter = payLoad;
 		},
 		deleteItem(state, id) {
-			let indexToDel = 0;
-			// находим порядковый номер элемента с id 
-			state.toDoItems.forEach( (item,index)=> {
-				if (item.id == id) { 
-					indexToDel = index
-					return;
-				}
-			})
+			let indexToDel = findIndex(state.toDoItems, id);
 			state.toDoItems.splice(indexToDel,1);
 		},
 		showAlert(state, payLoad) {

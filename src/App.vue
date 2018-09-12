@@ -87,9 +87,7 @@ ul {
 a {
   color: #42b983;
 }
-select {
-        -moz-appearance: none;
-}
+
 
 
 </style>

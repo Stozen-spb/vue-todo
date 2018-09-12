@@ -133,7 +133,7 @@
 
 			},
 			dateEndHumanFormat() {
-				return  moment(this.dateEnd).format('DD.MM.YYYY, HH:MM')
+				return  moment(this.dateEnd).format('DD.MM.YYYY, HH:mm')
 			},
 			priorityHumanFormat() {
 				const priorityList = ['низкий','средний','высокий'];
