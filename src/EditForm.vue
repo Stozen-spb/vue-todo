@@ -257,7 +257,7 @@
 				} else return false
 			},
 			dateEndHumanFormat(){
-				moment(this.dateEnd).format('DD.MM.YYYY, HH:MM')
+				return moment(this.fields.finishedTime).format('DD.MM.YYYY, HH:mm')
 			},
 			statusText(){
 				if (this.fields.status == 'done') {
