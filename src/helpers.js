@@ -13,14 +13,15 @@ function getIndex(n){
 // alert( ['дня', 'день', 'дней'][getIndex(12)] );
 
 function findIndex(arr, id) {
-	let result = -1;
-	// находим порядковый номер элемента с id 
-	arr.forEach( (item,index)=> {
-		if (item.id == id) {
-			result = index;
+	let i;
+
+	for ( i = 0; i < arr.length; i++) {
+		if (arr[i].id == id) {
+			return i;
 		}
-	})
-	return result;
+	}
+
+	return undefined;
 }
 /**
  * фильтрация
@@ -46,17 +47,16 @@ function dateFilter(filter,array, property) {
 	if (filter != 'all'){
 
 		if (filter == 'low') {
-			array = array.sort((a,b) => {
-			return Date.parse( a[property] ) > Date.parse( b[property] ) ? 1 : 0 ;
+			array.sort((a,b) => {
+			return ( Date.parse( a[property] ) > Date.parse( b[property] )) ? 1 : -1 ;
 			})
 		}
 
 		if (filter == 'high') {
-			array = array.sort((a,b) => {
-			return Date.parse( a[property] ) < Date.parse( b[property] ) ? 1 : 0 ;
+			array.sort((a,b) => {
+			return ( Date.parse( a[property] ) < Date.parse( b[property] )) ? 1 : -1 ;
 			})
 		}
-
 		return array;
 	} else return array;
 }
